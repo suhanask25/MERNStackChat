@@ -60,8 +60,16 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarContent>
+        <div className="flex items-center justify-center px-3 py-4 mb-2">
+          <img 
+            src="/logo.jpeg" 
+            alt="HER metrix Logo" 
+            className="h-20 w-20 object-contain"
+            data-testid="logo-sidebar"
+          />
+        </div>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-base font-semibold px-3 mb-2">
+          <SidebarGroupLabel className="text-base font-semibold px-3 mb-2 text-center">
             HER metrix
           </SidebarGroupLabel>
           <SidebarGroupContent>

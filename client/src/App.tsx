@@ -45,7 +45,16 @@ function App() {
             <AppSidebar />
             <div className="flex flex-col flex-1 min-w-0">
               <header className="flex items-center justify-between p-4 border-b bg-background sticky top-0 z-50">
-                <SidebarTrigger data-testid="button-sidebar-toggle" />
+                <div className="flex items-center gap-3">
+                  <SidebarTrigger data-testid="button-sidebar-toggle" />
+                  <img 
+                    src="/logo.jpeg" 
+                    alt="HER metrix Logo" 
+                    className="h-8 w-8 object-contain"
+                    data-testid="logo-header"
+                  />
+                  <span className="font-semibold text-foreground hidden sm:inline">HER metrix</span>
+                </div>
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-chart-2 animate-pulse" />
                   <span className="text-sm text-muted-foreground">AI-Powered Analysis</span>
