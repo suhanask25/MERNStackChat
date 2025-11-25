@@ -10,6 +10,9 @@ import Upload from "@/pages/upload";
 import Assessment from "@/pages/assessment";
 import History from "@/pages/history";
 import Tracking from "@/pages/tracking";
+import Chat from "@/pages/chat";
+import SOS from "@/pages/sos";
+import Hospitals from "@/pages/hospitals";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +21,9 @@ function Router() {
       <Route path="/" component={Dashboard} />
       <Route path="/upload" component={Upload} />
       <Route path="/assessment" component={Assessment} />
+      <Route path="/chat" component={Chat} />
+      <Route path="/sos" component={SOS} />
+      <Route path="/hospitals" component={Hospitals} />
       <Route path="/history" component={History} />
       <Route path="/tracking" component={Tracking} />
       <Route component={NotFound} />

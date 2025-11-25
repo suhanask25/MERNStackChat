@@ -61,6 +61,46 @@ export const insights = pgTable("insights", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const emergencyContacts = pgTable("emergency_contacts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  phone: text("phone").notNull(),
+  relationship: text("relationship"),
+  isPrimary: integer("is_primary").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const sosAlerts = pgTable("sos_alerts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  location: text("location"),
+  severity: text("severity").notNull().default('high'),
+  status: text("status").notNull().default('pending'),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  resolvedAt: timestamp("resolved_at"),
+});
+
+export const chatMessages = pgTable("chat_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  role: text("role").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertEmergencyContactSchema = createInsertSchema(emergencyContacts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertSosAlertSchema = createInsertSchema(sosAlerts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertMedicalReportSchema = createInsertSchema(medicalReports).omit({
   id: true,
   uploadedAt: true,
@@ -103,3 +143,9 @@ export type MedicalParameter = typeof medicalParameters.$inferSelect;
 export type InsertMedicalParameter = z.infer<typeof insertMedicalParameterSchema>;
 export type Insight = typeof insights.$inferSelect;
 export type InsertInsight = z.infer<typeof insertInsightSchema>;
+export type EmergencyContact = typeof emergencyContacts.$inferSelect;
+export type InsertEmergencyContact = z.infer<typeof insertEmergencyContactSchema>;
+export type SosAlert = typeof sosAlerts.$inferSelect;
+export type InsertSosAlert = z.infer<typeof insertSosAlertSchema>;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;

@@ -1,4 +1,4 @@
-import { Home, Upload, ClipboardList, History, TrendingUp } from "lucide-react";
+import { Home, Upload, ClipboardList, History, TrendingUp, MessageCircle, AlertTriangle, Hospital } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import {
   Sidebar,
@@ -26,6 +26,21 @@ const menuItems = [
     title: "Assessment",
     url: "/assessment",
     icon: ClipboardList,
+  },
+  {
+    title: "AI Chat",
+    url: "/chat",
+    icon: MessageCircle,
+  },
+  {
+    title: "SOS",
+    url: "/sos",
+    icon: AlertTriangle,
+  },
+  {
+    title: "Hospitals",
+    url: "/hospitals",
+    icon: Hospital,
   },
   {
     title: "History",

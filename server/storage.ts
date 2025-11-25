@@ -11,6 +11,12 @@ import type {
   InsertMedicalParameter,
   Insight,
   InsertInsight,
+  EmergencyContact,
+  InsertEmergencyContact,
+  SosAlert,
+  InsertSosAlert,
+  ChatMessage,
+  InsertChatMessage,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -36,6 +42,16 @@ export interface IStorage {
   
   createInsight(insight: InsertInsight): Promise<Insight>;
   getInsightsByReportId(reportId?: string): Promise<Insight[]>;
+
+  createEmergencyContact(contact: InsertEmergencyContact): Promise<EmergencyContact>;
+  getEmergencyContacts(): Promise<EmergencyContact[]>;
+  deleteEmergencyContact(id: string): Promise<void>;
+
+  createSosAlert(alert: InsertSosAlert): Promise<SosAlert>;
+  getSosAlerts(): Promise<SosAlert[]>;
+
+  createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
+  getChatMessages(): Promise<ChatMessage[]>;
 }
 
 import { db } from "./db";
@@ -188,6 +204,59 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(schema.insights)
       .orderBy(desc(schema.insights.createdAt));
+  }
+
+  async createEmergencyContact(insertContact: InsertEmergencyContact): Promise<EmergencyContact> {
+    const [contact] = await db
+      .insert(schema.emergencyContacts)
+      .values(insertContact)
+      .returning();
+    return contact;
+  }
+
+  async getEmergencyContacts(): Promise<EmergencyContact[]> {
+    return await db
+      .select()
+      .from(schema.emergencyContacts)
+      .orderBy(desc(schema.emergencyContacts.createdAt));
+  }
+
+  async deleteEmergencyContact(id: string): Promise<void> {
+    await db
+      .delete(schema.emergencyContacts)
+      .where(eq(schema.emergencyContacts.id, id));
+  }
+
+  async createSosAlert(insertAlert: InsertSosAlert): Promise<SosAlert> {
+    const [alert] = await db
+      .insert(schema.sosAlerts)
+      .values(insertAlert)
+      .returning();
+    return alert;
+  }
+
+  async getSosAlerts(): Promise<SosAlert[]> {
+    return await db
+      .select()
+      .from(schema.sosAlerts)
+      .orderBy(desc(schema.sosAlerts.createdAt))
+      .limit(50);
+  }
+
+  async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
+    const [message] = await db
+      .insert(schema.chatMessages)
+      .values(insertMessage)
+      .returning();
+    return message;
+  }
+
+  async getChatMessages(): Promise<ChatMessage[]> {
+    return await db
+      .select()
+      .from(schema.chatMessages)
+      .orderBy(schema.chatMessages.createdAt)
+      .limit(100);
   }
 }
 

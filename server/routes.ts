@@ -281,6 +281,120 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/emergency-contacts', async (req, res) => {
+    try {
+      const contacts = await storage.getEmergencyContacts();
+      res.json(contacts);
+    } catch (error) {
+      console.error('Emergency contacts error:', error);
+      res.status(500).json({ error: 'Failed to fetch emergency contacts' });
+    }
+  });
+
+  app.post('/api/emergency-contacts', async (req, res) => {
+    try {
+      const { name, phone, relationship, isPrimary } = req.body;
+      if (!name || !phone) {
+        return res.status(400).json({ error: 'Name and phone are required' });
+      }
+
+      const contact = await storage.createEmergencyContact({
+        name,
+        phone,
+        relationship: relationship || null,
+        isPrimary: isPrimary ? 1 : 0,
+      });
+      res.json(contact);
+    } catch (error) {
+      console.error('Create emergency contact error:', error);
+      res.status(500).json({ error: 'Failed to create emergency contact' });
+    }
+  });
+
+  app.delete('/api/emergency-contacts/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteEmergencyContact(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Delete emergency contact error:', error);
+      res.status(500).json({ error: 'Failed to delete emergency contact' });
+    }
+  });
+
+  app.get('/api/sos-alerts', async (req, res) => {
+    try {
+      const alerts = await storage.getSosAlerts();
+      res.json(alerts);
+    } catch (error) {
+      console.error('SOS alerts error:', error);
+      res.status(500).json({ error: 'Failed to fetch SOS alerts' });
+    }
+  });
+
+  app.post('/api/sos-trigger', async (req, res) => {
+    try {
+      const { location, severity } = req.body;
+      const alert = await storage.createSosAlert({
+        location: location || 'Unknown location',
+        severity: severity || 'high',
+        status: 'pending',
+      });
+      
+      const contacts = await storage.getEmergencyContacts();
+      console.log(`SOS Alert triggered. Notifying ${contacts.length} emergency contacts`);
+
+      res.json({ alert, contactsNotified: contacts.length });
+    } catch (error) {
+      console.error('SOS trigger error:', error);
+      res.status(500).json({ error: 'Failed to trigger SOS' });
+    }
+  });
+
+  app.get('/api/chat/messages', async (req, res) => {
+    try {
+      const messages = await storage.getChatMessages();
+      res.json(messages);
+    } catch (error) {
+      console.error('Chat messages error:', error);
+      res.status(500).json({ error: 'Failed to fetch chat messages' });
+    }
+  });
+
+  app.post('/api/chat/send', async (req, res) => {
+    try {
+      const { content } = req.body;
+      if (!content) {
+        return res.status(400).json({ error: 'Content is required' });
+      }
+
+      await storage.createChatMessage({
+        role: 'user',
+        content,
+      });
+
+      let aiResponse = "I'm here to help with your health concerns. Based on your medical reports and assessments, I can provide personalized guidance. What would you like to know?";
+      
+      if (content.toLowerCase().includes('pcos') || content.toLowerCase().includes('hormones')) {
+        aiResponse = "PCOS management involves lifestyle modifications, regular monitoring, and medical consultation. Key areas: 1) Diet - Low glycemic index foods, 2) Exercise - Regular cardio and strength training, 3) Stress management, 4) Regular check-ups. Have you discussed a treatment plan with your doctor?";
+      } else if (content.toLowerCase().includes('thyroid')) {
+        aiResponse = "Thyroid health is crucial. Key monitoring points: TSH levels, T3, T4 levels. Management includes regular testing, medication compliance if prescribed, and balanced diet with adequate iodine. Have you had recent thyroid tests?";
+      } else if (content.toLowerCase().includes('exercise') || content.toLowerCase().includes('workout')) {
+        aiResponse = "Regular exercise helps manage hormonal health. Recommended: 150 minutes moderate activity per week, strength training 2-3 times weekly. Start slowly and consult your doctor. What type of exercise interests you?";
+      }
+
+      await storage.createChatMessage({
+        role: 'assistant',
+        content: aiResponse,
+      });
+
+      res.json({ success: true, response: aiResponse });
+    } catch (error) {
+      console.error('Chat send error:', error);
+      res.status(500).json({ error: 'Failed to send message' });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
