@@ -62,7 +62,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-base font-semibold px-3 mb-2">
-            Women's Health Tracker
+            HER metrix
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
