@@ -1,0 +1,92 @@
+1. Technology Stack
+
+The project is built using the MERN stack — MongoDB, Express.js, React.js, and Node.js — combined with Google Gemini API for AI-powered medical analysis.
+This stack enables a fast, secure, and scalable platform for women to track their health conditions easily.
+
+2. System Architecture
+Frontend – React.js
+
+Provides a responsive UI that works on all device sizes.
+
+Allows users to upload PDF/Image medical reports.
+
+Displays a symptom assessment test with simple questions.
+
+Shows AI-generated risk score, insights, and daily tasks.
+
+Backend – Node.js + Express
+
+Handles file uploads from the frontend.
+
+Sends the uploaded report to Gemini Vision API.
+
+Processes AI output and extracts key medical parameters.
+
+Combines report data and assessment answers to calculate a risk score.
+
+Sends personalized recommendations and tasks back to the frontend.
+
+AI Layer – Gemini API
+
+Reads medical reports (PDF or image).
+
+Extracts structured values such as thyroid levels, insulin, hormones, PCOS markers, etc.
+
+Generates educational insights and daily routines (e.g., water intake, exercise, medication timing).
+
+Provides supportive and easy-to-understand explanations.
+
+Database – MongoDB
+
+Stores user profiles and assessment history.
+
+Saves extracted medical data for long-term tracking.
+
+Stores recommended daily tasks and AI-generated insights.
+
+3. Core Functionalities
+
+Medical Report Upload
+Users can upload PDF/image reports, which Gemini analyzes.
+
+Interactive Assessment Test
+Users answer simple questions about symptoms and lifestyle.
+
+AI Risk Score Calculation
+The backend processes all inputs and uses rules + AI analysis to generate a personalized risk score.
+
+Daily Health Tasks Generation
+Gemini creates tasks such as:
+✓ water intake
+✓ exercise plan
+✓ medication reminder
+✓ protein intake goal
+
+Condition Tracking
+Users can monitor PCOS, PCOD, and thyroid trends over time.
+
+4. Data Flow Summary
+
+React → Express → Gemini → Express → MongoDB → React
+
+User uploads file
+
+Node sends file to Gemini
+
+Gemini extracts values
+
+Node calculates score + structures results
+
+MongoDB stores the data
+
+React displays the results to the user
+
+5. Deployment Plan
+
+Frontend deployed on Netlify or Vercel
+
+Backend deployed on Render, Vercel, or Railway
+
+Database hosted on MongoDB Atlas
+
+Environment variables used to protect Gemini API keys
