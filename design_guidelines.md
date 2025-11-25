@@ -1,15 +1,15 @@
-# Design Guidelines: Women's Health Tracking Platform
+# Design Guidelines: HER metrix
 
 ## Design Approach & Philosophy
 
-**Selected Approach:** Healthcare-focused Material Design principles
-**Justification:** Healthcare applications require trust, clarity, and accessibility. Material Design provides robust patterns for data-dense interfaces while maintaining visual hierarchy and user confidence.
+**Selected Approach:** Modern, Vibrant Healthcare Design with Purple/Magenta Accent
+**Justification:** HER metrix combines professional healthcare standards with modern, engaging aesthetics. The purple/magenta theme conveys empowerment, wellness, and innovation while maintaining medical credibility.
 
 **Core Principles:**
-- **Trust through Clarity:** Medical data presentation must be unambiguous and professional
-- **Supportive Experience:** Calming, encouraging interface that reduces health anxiety
-- **Scannable Information:** Quick access to critical health metrics and tasks
-- **Progressive Disclosure:** Show essential info first, details on demand
+- **Empowerment through Design:** Bold, vibrant interface that celebrates women's health
+- **Modern Clarity:** Contemporary design language with clear hierarchy for medical data
+- **Supportive Experience:** Encouraging interface that motivates health tracking and wellness
+- **Accessible Innovation:** Cutting-edge design that remains intuitive and trustworthy
 
 ## Typography
 
