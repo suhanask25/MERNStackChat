@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { analyzeMedicalReport, calculateRiskScore, generateDailyTasks, generateInsights } from "./gemini";
+import { analyzeMedicalReport, calculateRiskScore, generateDailyTasks, generateInsights, generateChatResponse } from "./gemini";
 
 const uploadsDir = path.join(process.cwd(), 'uploads');
 if (!fs.existsSync(uploadsDir)) {
@@ -368,27 +368,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Content is required' });
       }
 
+      if (!process.env.GEMINI_API_KEY) {
+        return res.status(500).json({ error: 'AI service not configured. Please contact support.' });
+      }
+
       await storage.createChatMessage({
         role: 'user',
         content,
       });
 
-      let aiResponse = "I'm here to help with your health concerns. Based on your medical reports and assessments, I can provide personalized guidance. What would you like to know?";
-      
-      if (content.toLowerCase().includes('pcos') || content.toLowerCase().includes('hormones')) {
-        aiResponse = "PCOS management involves lifestyle modifications, regular monitoring, and medical consultation. Key areas: 1) Diet - Low glycemic index foods, 2) Exercise - Regular cardio and strength training, 3) Stress management, 4) Regular check-ups. Have you discussed a treatment plan with your doctor?";
-      } else if (content.toLowerCase().includes('thyroid')) {
-        aiResponse = "Thyroid health is crucial. Key monitoring points: TSH levels, T3, T4 levels. Management includes regular testing, medication compliance if prescribed, and balanced diet with adequate iodine. Have you had recent thyroid tests?";
-      } else if (content.toLowerCase().includes('exercise') || content.toLowerCase().includes('workout')) {
-        aiResponse = "Regular exercise helps manage hormonal health. Recommended: 150 minutes moderate activity per week, strength training 2-3 times weekly. Start slowly and consult your doctor. What type of exercise interests you?";
+      try {
+        const chatMessages = await storage.getChatMessages();
+        const conversationHistory = chatMessages.map(msg => ({
+          role: msg.role,
+          content: msg.content
+        }));
+
+        const aiResponse = await generateChatResponse(content, conversationHistory);
+        
+        await storage.createChatMessage({
+          role: 'assistant',
+          content: aiResponse,
+        });
+
+        res.json({ success: true, response: aiResponse });
+      } catch (aiError) {
+        console.error('AI generation error:', aiError);
+        const fallbackResponse = "I'm here to help with your health concerns. I encountered a temporary issue, but I'm ready to assist. Could you please rephrase your question or let me know what health topic you'd like to discuss?";
+        
+        await storage.createChatMessage({
+          role: 'assistant',
+          content: fallbackResponse,
+        });
+
+        res.json({ success: true, response: fallbackResponse });
       }
-
-      await storage.createChatMessage({
-        role: 'assistant',
-        content: aiResponse,
-      });
-
-      res.json({ success: true, response: aiResponse });
     } catch (error) {
       console.error('Chat send error:', error);
       res.status(500).json({ error: 'Failed to send message' });

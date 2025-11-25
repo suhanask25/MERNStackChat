@@ -232,3 +232,60 @@ Be supportive, clear, and empowering. Avoid medical jargon. Make it practical an
     throw new Error(`Failed to generate insights: ${error}`);
   }
 }
+
+export async function generateChatResponse(
+  userMessage: string,
+  conversationHistory: Array<{ role: string; content: string }>
+): Promise<string> {
+  try {
+    const ai = getAIClient();
+    
+    const systemPrompt = `You are HER metrix's compassionate and knowledgeable AI Health Assistant. You specialize in women's health, particularly:
+- PCOS/PCOD management and lifestyle optimization
+- Thyroid health and hormonal balance
+- Symptom management and wellness strategies
+- Nutrition, exercise, and stress management for women's health
+- Medical report interpretation and health insights
+
+Guidelines:
+1. Be empathetic and supportive while maintaining medical accuracy
+2. Provide evidence-based advice and recommendations
+3. Encourage users to consult healthcare providers for serious concerns
+4. Ask clarifying questions when needed to provide better guidance
+5. Explain medical concepts in simple, non-technical language
+6. Offer actionable, practical advice they can implement immediately
+7. Remember context from previous messages in the conversation
+8. Be encouraging and positive while being realistic
+
+Important: Never diagnose conditions or replace professional medical advice. Always recommend consulting a healthcare provider for medical concerns.`;
+
+    const contents = [
+      ...conversationHistory.map(msg => ({
+        role: msg.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: msg.content }]
+      })),
+      {
+        role: 'user',
+        parts: [{ text: userMessage }]
+      }
+    ];
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash-exp",
+      config: {
+        systemInstruction: systemPrompt,
+      },
+      contents: contents,
+    });
+
+    const aiResponse = response.text;
+    if (!aiResponse) {
+      throw new Error("Empty response from Gemini");
+    }
+    
+    return aiResponse;
+  } catch (error) {
+    console.error('Chat response generation error:', error);
+    throw new Error(`Failed to generate chat response: ${error}`);
+  }
+}
