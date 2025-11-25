@@ -1,10 +1,17 @@
 import * as fs from "fs";
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+function getAIClient() {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY environment variable is not set');
+  }
+  return new GoogleGenAI({ apiKey });
+}
 
 export async function analyzeMedicalReport(filePath: string, mimeType: string): Promise<any> {
   try {
+    const ai = getAIClient();
     const fileBytes = fs.readFileSync(filePath);
     
     const contents = [
@@ -67,6 +74,7 @@ export async function calculateRiskScore(
   assessmentAnswers: Record<string, string | number>
 ): Promise<{ score: number; riskLevel: string; interpretation: string }> {
   try {
+    const ai = getAIClient();
     const prompt = `You are a women's health risk assessment expert. Based on the following medical data and symptom assessment, calculate a health risk score.
 
 Medical Data:
@@ -125,6 +133,7 @@ export async function generateDailyTasks(
   riskScore: { score: number; riskLevel: string }
 ): Promise<Array<{ taskType: string; description: string; target?: string }>> {
   try {
+    const ai = getAIClient();
     const prompt = `You are a personalized health coach for women. Based on this medical data and risk assessment, create 4-6 specific, actionable daily health tasks.
 
 Medical Data:
@@ -176,6 +185,7 @@ export async function generateInsights(
   assessmentAnswers: Record<string, string | number>
 ): Promise<Array<{ category: string; title: string; content: string; severity?: string }>> {
   try {
+    const ai = getAIClient();
     const prompt = `You are a compassionate women's health educator. Based on this medical data and assessment, generate 3-5 personalized health insights.
 
 Medical Data:
