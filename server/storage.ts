@@ -17,6 +17,12 @@ import type {
   InsertSosAlert,
   ChatMessage,
   InsertChatMessage,
+  PeriodCycle,
+  InsertPeriodCycle,
+  WaterIntake,
+  InsertWaterIntake,
+  StepsTracker,
+  InsertStepsTracker,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -52,6 +58,18 @@ export interface IStorage {
 
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
   getChatMessages(): Promise<ChatMessage[]>;
+
+  createPeriodCycle(cycle: InsertPeriodCycle): Promise<PeriodCycle>;
+  getPeriodCycles(): Promise<PeriodCycle[]>;
+  getLatestPeriodCycle(): Promise<PeriodCycle | undefined>;
+
+  createWaterIntake(intake: InsertWaterIntake): Promise<WaterIntake>;
+  getWaterIntake(): Promise<WaterIntake[]>;
+  getWaterIntakeTodayTotal(): Promise<number>;
+
+  createStepsTracker(tracker: InsertStepsTracker): Promise<StepsTracker>;
+  getStepsTracker(): Promise<StepsTracker[]>;
+  getStepsTodayTotal(): Promise<number>;
 }
 
 import { db } from "./db";
@@ -257,6 +275,98 @@ export class DatabaseStorage implements IStorage {
       .from(schema.chatMessages)
       .orderBy(schema.chatMessages.createdAt)
       .limit(100);
+  }
+
+  async createPeriodCycle(insertCycle: InsertPeriodCycle): Promise<PeriodCycle> {
+    const [cycle] = await db
+      .insert(schema.periodCycles)
+      .values(insertCycle)
+      .returning();
+    return cycle;
+  }
+
+  async getPeriodCycles(): Promise<PeriodCycle[]> {
+    return await db
+      .select()
+      .from(schema.periodCycles)
+      .orderBy(desc(schema.periodCycles.startDate));
+  }
+
+  async getLatestPeriodCycle(): Promise<PeriodCycle | undefined> {
+    const [cycle] = await db
+      .select()
+      .from(schema.periodCycles)
+      .orderBy(desc(schema.periodCycles.startDate))
+      .limit(1);
+    return cycle || undefined;
+  }
+
+  async createWaterIntake(insertIntake: InsertWaterIntake): Promise<WaterIntake> {
+    const [intake] = await db
+      .insert(schema.waterIntake)
+      .values(insertIntake)
+      .returning();
+    return intake;
+  }
+
+  async getWaterIntake(): Promise<WaterIntake[]> {
+    return await db
+      .select()
+      .from(schema.waterIntake)
+      .orderBy(desc(schema.waterIntake.date));
+  }
+
+  async getWaterIntakeTodayTotal(): Promise<number> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const result = await db
+      .select()
+      .from(schema.waterIntake)
+      .where(
+        (col) => {
+          const dateCol = schema.waterIntake.date;
+          return `${dateCol} >= $1 AND ${dateCol} < $2`;
+        }
+      );
+    
+    return result.reduce((sum, entry) => sum + entry.amountMl, 0);
+  }
+
+  async createStepsTracker(insertTracker: InsertStepsTracker): Promise<StepsTracker> {
+    const [tracker] = await db
+      .insert(schema.stepsTracker)
+      .values(insertTracker)
+      .returning();
+    return tracker;
+  }
+
+  async getStepsTracker(): Promise<StepsTracker[]> {
+    return await db
+      .select()
+      .from(schema.stepsTracker)
+      .orderBy(desc(schema.stepsTracker.date));
+  }
+
+  async getStepsTodayTotal(): Promise<number> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const result = await db
+      .select()
+      .from(schema.stepsTracker)
+      .where(
+        (col) => {
+          const dateCol = schema.stepsTracker.date;
+          return `${dateCol} >= $1 AND ${dateCol} < $2`;
+        }
+      );
+    
+    return result.reduce((sum, entry) => sum + entry.steps, 0);
   }
 }
 

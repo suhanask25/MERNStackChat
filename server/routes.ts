@@ -409,6 +409,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Period Cycle endpoints
+  app.post('/api/period-cycles', async (req, res) => {
+    try {
+      const { startDate, endDate, flowIntensity, symptoms, notes } = req.body;
+      const cycle = await storage.createPeriodCycle({
+        startDate: new Date(startDate),
+        endDate: endDate ? new Date(endDate) : undefined,
+        flowIntensity: flowIntensity || null,
+        symptoms: symptoms || null,
+        notes: notes || null,
+      });
+      res.json(cycle);
+    } catch (error) {
+      console.error('Create period cycle error:', error);
+      res.status(500).json({ error: 'Failed to create period cycle' });
+    }
+  });
+
+  app.get('/api/period-cycles', async (req, res) => {
+    try {
+      const cycles = await storage.getPeriodCycles();
+      res.json(cycles);
+    } catch (error) {
+      console.error('Get period cycles error:', error);
+      res.status(500).json({ error: 'Failed to fetch period cycles' });
+    }
+  });
+
+  // Water Intake endpoints
+  app.post('/api/water-intake', async (req, res) => {
+    try {
+      const { date, amountMl, time, notes } = req.body;
+      if (!amountMl) {
+        return res.status(400).json({ error: 'Amount is required' });
+      }
+      const intake = await storage.createWaterIntake({
+        date: new Date(date || new Date()),
+        amountMl,
+        time: time || null,
+        notes: notes || null,
+      });
+      res.json(intake);
+    } catch (error) {
+      console.error('Create water intake error:', error);
+      res.status(500).json({ error: 'Failed to log water intake' });
+    }
+  });
+
+  app.get('/api/water-intake', async (req, res) => {
+    try {
+      const intakes = await storage.getWaterIntake();
+      res.json(intakes);
+    } catch (error) {
+      console.error('Get water intake error:', error);
+      res.status(500).json({ error: 'Failed to fetch water intake' });
+    }
+  });
+
+  app.get('/api/water-intake/today-total', async (req, res) => {
+    try {
+      const total = await storage.getWaterIntakeTodayTotal();
+      res.json({ total });
+    } catch (error) {
+      console.error('Get water intake total error:', error);
+      res.status(500).json({ error: 'Failed to fetch today total' });
+    }
+  });
+
+  // Steps Tracker endpoints
+  app.post('/api/steps-tracker', async (req, res) => {
+    try {
+      const { date, steps, distance, caloriesBurned, duration, notes } = req.body;
+      if (!steps) {
+        return res.status(400).json({ error: 'Steps is required' });
+      }
+      const tracker = await storage.createStepsTracker({
+        date: new Date(date || new Date()),
+        steps,
+        distance: distance ? parseFloat(distance) : undefined,
+        caloriesBurned: caloriesBurned ? parseFloat(caloriesBurned) : undefined,
+        duration: duration || null,
+        notes: notes || null,
+      });
+      res.json(tracker);
+    } catch (error) {
+      console.error('Create steps tracker error:', error);
+      res.status(500).json({ error: 'Failed to log steps' });
+    }
+  });
+
+  app.get('/api/steps-tracker', async (req, res) => {
+    try {
+      const tracker = await storage.getStepsTracker();
+      res.json(tracker);
+    } catch (error) {
+      console.error('Get steps tracker error:', error);
+      res.status(500).json({ error: 'Failed to fetch steps tracker' });
+    }
+  });
+
+  app.get('/api/steps-tracker/today-total', async (req, res) => {
+    try {
+      const total = await storage.getStepsTodayTotal();
+      res.json({ total });
+    } catch (error) {
+      console.error('Get steps total error:', error);
+      res.status(500).json({ error: 'Failed to fetch today total' });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
