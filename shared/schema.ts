@@ -86,6 +86,36 @@ export const chatMessages = pgTable("chat_messages", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const periodCycles = pgTable("period_cycles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  flowIntensity: text("flow_intensity"),
+  symptoms: text("symptoms"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const waterIntake = pgTable("water_intake", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  date: timestamp("date").notNull(),
+  amountMl: integer("amount_ml").notNull(),
+  time: text("time"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const stepsTracker = pgTable("steps_tracker", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  date: timestamp("date").notNull(),
+  steps: integer("steps").notNull(),
+  distance: decimal("distance", { precision: 5, scale: 2 }),
+  caloriesBurned: decimal("calories_burned", { precision: 6, scale: 2 }),
+  duration: integer("duration"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertEmergencyContactSchema = createInsertSchema(emergencyContacts).omit({
   id: true,
   createdAt: true,
@@ -149,3 +179,23 @@ export type SosAlert = typeof sosAlerts.$inferSelect;
 export type InsertSosAlert = z.infer<typeof insertSosAlertSchema>;
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type PeriodCycle = typeof periodCycles.$inferSelect;
+export type WaterIntake = typeof waterIntake.$inferSelect;
+export type StepsTracker = typeof stepsTracker.$inferSelect;
+
+export const insertPeriodCycleSchema = createInsertSchema(periodCycles).omit({
+  id: true,
+  createdAt: true,
+});
+export const insertWaterIntakeSchema = createInsertSchema(waterIntake).omit({
+  id: true,
+  createdAt: true,
+});
+export const insertStepsTrackerSchema = createInsertSchema(stepsTracker).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertPeriodCycle = z.infer<typeof insertPeriodCycleSchema>;
+export type InsertWaterIntake = z.infer<typeof insertWaterIntakeSchema>;
+export type InsertStepsTracker = z.infer<typeof insertStepsTrackerSchema>;
