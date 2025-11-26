@@ -73,7 +73,7 @@ export interface IStorage {
 }
 
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, gte, lt, and } from "drizzle-orm";
 import * as schema from "@shared/schema";
 
 export class DatabaseStorage implements IStorage {
@@ -326,10 +326,10 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(schema.waterIntake)
       .where(
-        (col) => {
-          const dateCol = schema.waterIntake.date;
-          return `${dateCol} >= $1 AND ${dateCol} < $2`;
-        }
+        and(
+          gte(schema.waterIntake.date, today),
+          lt(schema.waterIntake.date, tomorrow)
+        )
       );
     
     return result.reduce((sum, entry) => sum + entry.amountMl, 0);
@@ -360,10 +360,10 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(schema.stepsTracker)
       .where(
-        (col) => {
-          const dateCol = schema.stepsTracker.date;
-          return `${dateCol} >= $1 AND ${dateCol} < $2`;
-        }
+        and(
+          gte(schema.stepsTracker.date, today),
+          lt(schema.stepsTracker.date, tomorrow)
+        )
       );
     
     return result.reduce((sum, entry) => sum + entry.steps, 0);
