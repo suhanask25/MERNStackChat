@@ -1,4 +1,4 @@
-import { Home, Upload, ClipboardList, History, TrendingUp, MessageCircle, AlertTriangle, Hospital } from "lucide-react";
+import { Home, Upload, ClipboardList, History, TrendingUp, MessageCircle, AlertTriangle, Building2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import {
   Sidebar,
@@ -40,7 +40,7 @@ const menuItems = [
   {
     title: "Hospitals",
     url: "/hospitals",
-    icon: Hospital,
+    icon: Building2,
   },
   {
     title: "History",
